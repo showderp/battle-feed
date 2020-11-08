@@ -6,6 +6,7 @@ const webhookId = process.env.WEBHOOK_ID || '';
 const webhookToken = process.env.WEBHOOK_TOKEN || '';
 const battleNotifierKeyValueTableName = process.env.BATTLE_NOTIFIER_KEY_VALUE_TABLE_NAME || '';
 
+// eslint-disable-next-line import/prefer-default-export
 export const handler = async (): Promise<void> => {
   const dynamoClient = new DynamoDB.DocumentClient();
   const response = await dynamoClient.get({

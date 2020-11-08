@@ -15,12 +15,16 @@ export interface Post {
   trip?: string;
   sub?: string;
   com?: string;
-};
+}
 
 export const getCatalog = async (board: string) => {
-  return (await axios.get<CatalogPage[]>(`https://a.4cdn.org/${board}/catalog.json`)).data.flatMap((page) => page.threads);
+  const response = await axios.get<CatalogPage[]>(`https://a.4cdn.org/${board}/catalog.json`);
+
+  return response.data.flatMap((page) => page.threads);
 };
 
 export const getThread = async (board: string, postNumber: number) => {
-  return (await axios.get<Thread>(`https://a.4cdn.org/${board}/thread/${postNumber}.json`)).data.posts;
+  const response = await axios.get<Thread>(`https://a.4cdn.org/${board}/thread/${postNumber}.json`);
+
+  return response.data.posts;
 };

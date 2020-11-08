@@ -4,8 +4,10 @@ const showderpKeywords: string[] = ['showderp', 'dogars.ml', 'dogars.ga'];
 const showdownBattleLinkPattern: RegExp = /(https?:\/\/)?play.pokemonshowdown.com\/battle-([^\s]*)/gi;
 
 const isShowderpThread = (post: Post) => {
-  const doesCommentContainKeyword = showderpKeywords.some((keyword) => post.com && post.com.includes(keyword));
-  const doesSubjectContainKeyword = showderpKeywords.some((keyword) => post.sub && post.sub.includes(keyword));
+  const doesCommentContainKeyword = showderpKeywords
+    .some((keyword) => post.com && post.com.includes(keyword));
+  const doesSubjectContainKeyword = showderpKeywords
+    .some((keyword) => post.sub && post.sub.includes(keyword));
 
   return doesCommentContainKeyword || doesSubjectContainKeyword;
 };
@@ -15,9 +17,7 @@ export const getCurrentThread = async (): Promise<Post | undefined> => {
 
   return catalog.reduce((currentThread: Post | undefined, thread) => {
     if (isShowderpThread(thread)) {
-      if (!currentThread) {
-        return thread;
-      } else if (thread.no > currentThread.no) {
+      if (!currentThread || (thread.no > currentThread.no)) {
         return thread;
       }
     }
@@ -26,8 +26,11 @@ export const getCurrentThread = async (): Promise<Post | undefined> => {
   }, undefined);
 };
 
-export const getCurrentBattlePost = async (thread: Post, lastExecutedTime?: number): Promise<[Post, string] | undefined> => {
-  const posts = await getThread('vp',  thread.no);
+export const getCurrentBattlePost = async (
+  thread: Post,
+  lastExecutedTime?: number,
+): Promise<[Post, string] | undefined> => {
+  const posts = await getThread('vp', thread.no);
 
   const battlePost: Post | undefined = posts.reverse()
     .find((post) => {
@@ -49,9 +52,9 @@ export const getCurrentBattlePost = async (thread: Post, lastExecutedTime?: numb
   if (battlePost) {
     if (battlePost.com) {
       const comment = battlePost.com
-          .replace(/<wbr>/gm, '')
-          .replace(/<(?:.|\n)*?>/gm, ' ');
-          
+        .replace(/<wbr>/gm, '')
+        .replace(/<(?:.|\n)*?>/gm, ' ');
+
       const matches = comment.match(showdownBattleLinkPattern);
 
       if (matches && matches.length > 0) {
