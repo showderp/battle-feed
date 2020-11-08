@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Parameters:
+  WebhookId:
+    Type: Number
+  WebhookToken:
+    Type: String
+  BattleNotifierKeyValueTableName:
+    Type: String
+    Default: BattleNotifierKeyValueTable
+
+Resources:
+  BattleNotifierKeyValueTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref BattleNotifierKeyValueTableName
+      AttributeDefinitions:
+        -
+          AttributeName: key
+          AttributeType: S
+      KeySchema:
+        -
+          AttributeName: key
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+  BattleNotifier:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Checks 4chan for new champ posts.
+      Runtime: nodejs12.x
+      Handler: dist/index.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref BattleNotifierKeyValueTable
+        - DynamoDBWritePolicy:
+            TableName: !Ref BattleNotifierKeyValueTable
+      Environment:
+        Variables:
+          WEBHOOK_ID: !Ref WebhookId
+          WEBHOOK_TOKEN: !Ref WebhookToken
+          BATTLE_NOTIFIER_KEY_VALUE_TABLE_NAME: !Ref BattleNotifierKeyValueTable
+      Events:
+        CloudWatchEvent:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+      MemorySize: 128
+      Timeout: 100
