@@ -1,15 +1,16 @@
-import { MessageEmbed, WebhookClient } from 'discord.js';
+import { Client, MessageEmbed, TextChannel } from 'discord.js';
 import { Post } from './yotsuba';
 
 // eslint-disable-next-line import/prefer-default-export
 export const notifyBattle = async (
-  webhookId: string,
-  webhookToken: string,
+  botToken: string,
+  channelId: string,
   thread: Post,
   post: Post,
   battleLink: string,
 ) => {
-  const webhookClient = new WebhookClient(webhookId, webhookToken);
+  const discordClient = new Client();
+  await discordClient.login(botToken);
 
   const embed = new MessageEmbed()
     .setDescription(battleLink)
@@ -22,8 +23,16 @@ export const notifyBattle = async (
       `https://boards.4channel.org/vp/thread/${thread.no}#p${post.no}`,
     );
 
-  await webhookClient.send({
-    nonce: `${post.no}`,
-    embeds: [embed],
-  });
+  const channel = await discordClient.channels.fetch(channelId);
+
+  if (channel && channel.isText()) {
+    const textChannel = channel as TextChannel;
+
+    const message = await textChannel.send(embed);
+    await message.crosspost();
+
+    return true;
+  }
+
+  return false;
 };

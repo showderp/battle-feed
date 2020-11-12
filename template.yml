@@ -4,9 +4,9 @@ Transform:
 - AWS::Serverless-2016-10-31
 
 Parameters:
-  WebhookId:
-    Type: Number
-  WebhookToken:
+  BotToken:
+    Type: String
+  ChannelId:
     Type: String
   BattleNotifierKeyValueTableName:
     Type: String
@@ -41,8 +41,8 @@ Resources:
             TableName: !Ref BattleNotifierKeyValueTable
       Environment:
         Variables:
-          WEBHOOK_ID: !Ref WebhookId
-          WEBHOOK_TOKEN: !Ref WebhookToken
+          BOT_TOKEN: !Ref BotToken
+          CHANNEL_ID: !Ref ChannelId
           BATTLE_NOTIFIER_KEY_VALUE_TABLE_NAME: !Ref BattleNotifierKeyValueTable
       Events:
         CloudWatchEvent:
